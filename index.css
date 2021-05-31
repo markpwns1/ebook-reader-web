@@ -21,6 +21,15 @@ html, body {
     margin-bottom: 10px;
 }
 
+.italic {
+    font-style: italic;
+}
+
+a {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
 @media (max-width:480px)  {
 
     .centered-image {
