@@ -9,9 +9,13 @@ html, body {
     overflow-x: hidden;
 }
 
-#result {
+#content {
     text-align: left;
-    
+}
+
+.toc-holder {
+    text-align: left;
+    margin-left: 10px;
 }
 
 .centered-image {
@@ -43,7 +47,7 @@ a {
         padding: 0;
     }
 
-    #result {
+    #content {
         /* width: 100%; */
         margin-left: 10px;
         margin-right: 10px;
@@ -55,7 +59,7 @@ a {
         width: 50%;
     }
 
-    #result {
+    #content {
         min-width: 500px;
         width: 50%;
         margin: auto;

@@ -10,10 +10,22 @@
         <link rel="stylesheet" href="index.css">
     </head>
     <body>
-        <h3>Choose an EPUB file</h3>
-        <input type="file" id="file" name="file" /><br />
+        <div>
+            <h3>Choose an EPUB file to read</h3>
+            <input type="file" id="file" name="file" /> <br />
+            <input type="button" id="fullscreen" value="Hide navigation bar"> <br />
+        </div>
 
-        <div id="result">
+        <div class="toc-holder" hidden>
+            <h1 id="book-title"></h3>
+            <h3>Table of contents</h5>
+            <ol id="table-of-contents">
+
+            </ol>
+        </div>
+
+        <div id="content">
+            
 
         </div>
         <!-- <input type="button" id="btn-load-more" value="Load Next Section"/> -->
