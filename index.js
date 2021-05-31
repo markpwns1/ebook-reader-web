@@ -32,11 +32,12 @@ const goto = link => {
     const onReady = () => {
         const url = location.href;
         if(link.includes("#")) {
+            link = root + link;
             location.href = link.substring(link.indexOf("#"));
             history.replaceState(null, null, url); 
         }
         else {
-            location.href = "#GOTO_" + link.hashCode();
+            location.href = "#GOTO_" + (root + link).hashCode();
             // console.log("#GOTO_" + link.hashCode());
             history.replaceState(null, null, url); 
         } 
