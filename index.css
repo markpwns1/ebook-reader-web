@@ -16,6 +16,7 @@ html, body {
 .toc-holder {
     text-align: left;
     margin-left: 10px;
+    margin-right: 30px;
 }
 
 .centered-image {

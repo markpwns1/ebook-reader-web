@@ -133,39 +133,59 @@ function handleFile(f) {
     .then(function(zip) {
         book.zip = zip;
 
-        zip.file("content.opf").async("text").then(txt => {
-            // console.log(txt)
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(txt, "application/xhtml+xml");
-            const items = doc.getElementsByTagName("item");
-            for (const item of items) {
-                book.content.push({
-                    href: item.getAttribute("href"),
-                    id: item.getAttribute("id"),
-                    mediaType: item.getAttribute("media-type")
-                });
-            }
-            const spineItems = doc.getElementsByTagName("itemref");
-            for (const spineItem of spineItems) {
-                book.spine.push(spineItem.getAttribute("idref"));
-            }
-            
-            zip.file("toc.ncx").async("text").then(txt => {
-                const $xml = $($.parseXML(txt));
-                book.title = $xml.find("docTitle>text").text();
-                let navPoints = $xml.find("navPoint");
-                navPoints = navPoints.sort((a, b) => a.playOrder - b.playOrder)
-                for (const navPoint of navPoints) {
-                    book.tableOfContents.push({
-                        label: $(navPoint).find("text").text(),
-                        link: $(navPoint).find("content").attr("src")
+        zip.file("META-INF/container.xml").async("text").then(txt => {
+            const $containerXML = $($.parseXML(txt));
+            const contentFile = $containerXML.find("rootfile").attr("full-path");
+
+            zip.file(contentFile).async("text").then(txt => {
+                // console.log(contentFile);
+                let root = "";
+                if(contentFile.includes("/")) {
+                    root = contentFile.substring(0, contentFile.lastIndexOf("/") + 1)
+                }
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(txt, "application/xhtml+xml");
+                const items = doc.getElementsByTagName("item");
+                for (const item of items) {
+                    book.content.push({
+                        href: root + item.getAttribute("href"),
+                        id: item.getAttribute("id"),
+                        mediaType: item.getAttribute("media-type")
                     });
                 }
-
-                populateTableOfContents();
-                loadPage(0);
+                const spineItems = doc.getElementsByTagName("itemref");
+                for (const spineItem of spineItems) {
+                    book.spine.push(spineItem.getAttribute("idref"));
+                }
+                
+                const ncxFile = book.content.find(x => x.id == "ncx" && x.mediaType == "application/x-dtbncx+xml");
+                if(ncxFile) {
+                    console.log(ncxFile);
+                    console.log(book.content);
+                    zip.file(ncxFile.href).async("text").then(txt => {
+                        const $xml = $($.parseXML(txt));
+                        book.title = $xml.find("docTitle>text").text();
+                        let navPoints = $xml.find("navPoint");
+                        navPoints = navPoints.sort((a, b) => a.playOrder - b.playOrder)
+                        for (const navPoint of navPoints) {
+                            book.tableOfContents.push({
+                                label: $(navPoint).find("text").text(),
+                                link: $(navPoint).find("content").attr("src")
+                            });
+                        }
+        
+                        populateTableOfContents();
+                        loadPage(0);
+                    });
+                }
+                else {
+                    populateTableOfContents();
+                    loadPage(0);
+                }
+                
             });
         });
+        
     }, function (e) {
         console.log("Error reading " + f.name + ": " + e.message);
     });
