@@ -22,9 +22,10 @@ let $content;
 let currentPage = 0;
 let loaded = [ ];
 let loading = false;
+let root = "";
 
 const goto = link => {
-    const foundContent = book.content.find(x => x.href == link.substring(0, link.indexOf("#") < 0? link.length : link.indexOf("#")));
+    const foundContent = book.content.find(x => x.href == root + link.substring(0, link.indexOf("#") < 0? link.length : link.indexOf("#")));
     const foundSpineEntry = book.spine.find(x => x == foundContent.id);
     const index = book.spine.indexOf(foundSpineEntry);
 
@@ -36,7 +37,7 @@ const goto = link => {
         }
         else {
             location.href = "#GOTO_" + link.hashCode();
-            console.log("#GOTO_" + link.hashCode());
+            // console.log("#GOTO_" + link.hashCode());
             history.replaceState(null, null, url); 
         } 
     }
@@ -58,10 +59,13 @@ const goto = link => {
 
 const loadPage = (index, callback) => {
 
+    console.log("Verifying valid load...");
+
     if(loading) return;
     if(index < currentPage) return;
     if(index >= book.spine.length) return;
 
+    console.log("Loading");
     let oldCurrentPage = currentPage;
     currentPage = index;
     loading = true;
@@ -74,8 +78,9 @@ const loadPage = (index, callback) => {
         const $page = $(txt);
 
         for(const img of $page.find("img")) {
-            const imgSrc = img.getAttribute("src");
-            book.zip.file(imgSrc).async("blob").then(blob => {
+            const imgSrc = img.getAttribute("src").replace("./", "");
+            // console.log(root + imgSrc);
+            book.zip.file(root + imgSrc).async("blob").then(blob => {
                 img.src = URL.createObjectURL(blob);
             });
             img.classList.add("centered-image");
@@ -83,7 +88,7 @@ const loadPage = (index, callback) => {
 
         for (const img of $page.find("image")) {
             const $newImage = $(img);
-            book.zip.file($newImage.attr("xlink:href")).async("blob").then(blob => {
+            book.zip.file(root + $newImage.attr("xlink:href")).async("blob").then(blob => {
                 $newImage.attr("xlink:href", URL.createObjectURL(blob));
             });
         }
@@ -107,6 +112,7 @@ const loadPage = (index, callback) => {
     }).catch(error => {
         currentPage = oldCurrentPage;
         loading = false;
+        console.log(error);
     });
 }
 
@@ -139,7 +145,6 @@ function handleFile(f) {
 
             zip.file(contentFile).async("text").then(txt => {
                 // console.log(contentFile);
-                let root = "";
                 if(contentFile.includes("/")) {
                     root = contentFile.substring(0, contentFile.lastIndexOf("/") + 1)
                 }
@@ -160,8 +165,8 @@ function handleFile(f) {
                 
                 const ncxFile = book.content.find(x => x.id == "ncx" && x.mediaType == "application/x-dtbncx+xml");
                 if(ncxFile) {
-                    console.log(ncxFile);
-                    console.log(book.content);
+                    // console.log(ncxFile);
+                    // console.log(book.content);
                     zip.file(ncxFile.href).async("text").then(txt => {
                         const $xml = $($.parseXML(txt));
                         book.title = $xml.find("docTitle>text").text();
