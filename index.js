@@ -24,7 +24,7 @@ let loaded = [ ];
 let loading = false;
 let root = "";
 
-const goto = link => {
+const goto = (link, callback) => {
     const foundContent = book.content.find(x => x.href == root + link.substring(0, link.indexOf("#") < 0? link.length : link.indexOf("#")));
     const foundSpineEntry = book.spine.find(x => x == foundContent.id);
     const index = book.spine.indexOf(foundSpineEntry);
@@ -41,6 +41,7 @@ const goto = link => {
             // console.log("#GOTO_" + link.hashCode());
             history.replaceState(null, null, url); 
         } 
+        if(callback) callback();
     }
 
     const loadLoop = () => {
@@ -76,7 +77,7 @@ const loadPage = (index, callback) => {
     book.zip.file(content.href).async("text").then(txt => {
         loaded.push(content.href);
         const $a = $("<a id='GOTO_" + content.href.hashCode() + "' ></a>");
-        const $page = $(txt);
+        const $page = $("<div>" + txt + "</div>");
 
         for(const img of $page.find("img")) {
             const imgSrc = img.getAttribute("src").replace("./", "");
@@ -97,6 +98,10 @@ const loadPage = (index, callback) => {
         for (const a of $page.find("a")) {
             const $a = $(a);
             const link = $a.attr("href");
+            if(link.startsWith("http://") || link.startsWith("https://")) {
+                $a.attr("target", "_blank");
+                continue;
+            }
             $a.removeAttr("href");
             $a.click(() => {
                 goto(link);
@@ -109,6 +114,8 @@ const loadPage = (index, callback) => {
         loading = false;
 
         if(callback) callback();
+
+        detectNextPageLoad();
         // loadPage(index + 1);
     }).catch(error => {
         currentPage = oldCurrentPage;
@@ -125,7 +132,7 @@ function populateTableOfContents() {
         const $a = $(document.createElement("a"));
         $a.text(item.label);
         $a.click(() => {
-            goto(item.link);
+            goto(item.link, closeMenu);
         });
         $item.append($a);
         $toc.append($item);
@@ -134,7 +141,12 @@ function populateTableOfContents() {
     $("#book-title").text(book.title);
 }
 
+function closeMenu() {
+    $(".overlay").hide();
+}
+
 function handleFile(f) {
+
 
     JSZip.loadAsync(f)
     .then(function(zip) {
@@ -181,12 +193,12 @@ function handleFile(f) {
                         }
         
                         populateTableOfContents();
-                        loadPage(0);
+                        loadPage(0, closeMenu);
                     });
                 }
                 else {
                     populateTableOfContents();
-                    loadPage(0);
+                    loadPage(0, closeMenu);
                 }
                 
             });
@@ -197,18 +209,34 @@ function handleFile(f) {
     });
 }
 
+const detectNextPageLoad = () => {
+    if ((window.innerHeight + window.scrollY) >= document.body.scrollHeight - 50) {
+        loadPage(currentPage + 1);
+    }
+};
 
-window.onload = () => {
+$(document).ready(() => {
 
     $content = $("#content");
-    $content.html("");
+    // $content.html("");
 
     let $files = $("#file");
-    if($files[0].files.length > 0)
+    if($files[0].files.length > 0) {
+        $content.html("");
         handleFile($files[0].files[0]);
+    }
+
+    $("#btn-open-file").click(() => {
+        $files.trigger('click');
+    });
 
     $("#btn-load-more").click(() => {
         loadPage(currentPage + 1);
+    });
+
+    $("#btn-scroll-to-top").click(() => {
+        window.scrollTo(0, 0); 
+        closeMenu();
     });
 
     var viewFullScreen = document.getElementById("fullscreen");
@@ -227,12 +255,7 @@ window.onload = () => {
         });
     }
 
-    window.onscroll = function(ev) {
-        if ((window.innerHeight + window.scrollY) >= document.body.scrollHeight - 50) {
-            // alert("HELLO");
-            loadPage(currentPage + 1);
-        }
-    };
+    window.onscroll = detectNextPageLoad;
 
     $("#file").on("change", function(evt) {
         $content.html("");
@@ -242,5 +265,13 @@ window.onload = () => {
             handleFile(files[i]);
         }
     });
-}
+
+    $("#btn-menu").click(() => {
+        $(".overlay").show();
+    });
+
+    $("#btn-exit-menu").click(() => {
+        $(".overlay").hide();
+    });
+});
 

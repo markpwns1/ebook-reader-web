@@ -10,24 +10,44 @@
         <link rel="stylesheet" href="index.css">
     </head>
     <body>
-        <div class="selection">
+        <div class="overlay" hidden>
+            <input type="button" id="btn-exit-menu" value="back" />
+            <div class="settings">
+                <h3>Menu</h3>
+                <input type="button" id="btn-open-file" value="open file" />
+                <input type="button" id="fullscreen" value="toggle fullscreen" />
+                <input type="button" id="btn-scroll-to-top" value="scroll to top" />
+                <div class="toc-holder" hidden>
+                    <h1 id="book-title"></h3>
+                    <h3>Table of Contents</h3>
+                    <!-- <h3><a id="btn-toc-hide">Hide</a></h3> -->
+                    <ol id="table-of-contents">
+        
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <input type="button" id="btn-menu" value="menu" />
+        <!-- <div class="selection">
             <h3>Choose an EPUB file to read</h3>
             <input type="file" id="file" name="file" /> <br />
-            <input type="button" id="fullscreen" value="Hide navigation bar"> <br />
-        </div>
+            <input type="button" id="fullscreen" value="Fullscreen (useful on mobile)" /> <br />
+        </div> -->
 
-        <div class="toc-holder" hidden>
-            <h1 id="book-title"></h3>
-            <h3>Table of contents</h5>
-            <!-- <h3><a id="btn-toc-hide">Hide</a></h3> -->
-            <ol id="table-of-contents">
-
-            </ol>
-        </div>
+        <input type="file" id="file" name="file" hidden />
 
         <div id="content">
-            
-
+            <br>
+            <br>
+            <h2>Functionally Deficient E-Book Reader</h2>
+            Reads E-Books and not much more.
+            <br>
+            <br>
+            To start reading, open the menu and select "open file".
+            <br>
+            <br>
+            Note that this site is meant to be used for E-Books that are light on formatting. Things like textbooks will be massacred--you're better off using less functionally deficient E-Book readers for those.
         </div>
         <!-- <input type="button" id="btn-load-more" value="Load Next Section"/> -->
     </body>

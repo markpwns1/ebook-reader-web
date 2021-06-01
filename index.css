@@ -19,6 +19,11 @@ html, body {
     margin-right: 30px;
 }
 
+#table-of-contents {
+    overflow-y: auto;
+    height: 60%;
+}
+
 .centered-image {
     display: block;
     margin-left: auto;
@@ -33,6 +38,23 @@ html, body {
 a {
     text-decoration: underline;
     cursor: pointer;
+    color: inherit;
+}
+
+#btn-menu, #btn-exit-menu {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+}
+
+.overlay {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    background: rgba(51,51,51,1);
+    z-index: 10;
 }
 
 @media (max-width:480px)  {
@@ -46,10 +68,15 @@ a {
     body {
         /* width: 100%; */
         padding: 0;
+        margin-left: 10px;
+        margin-right: 10px;
     }
 
-    #content, .toc-holder, .selection {
-        /* width: 100%; */
+    #book-title {
+        display: none;
+    }
+
+    .settings {
         margin-left: 10px;
         margin-right: 10px;
     }
@@ -60,7 +87,7 @@ a {
         width: 50%;
     }
 
-    #content, .toc-holder, .selection {
+    #content, .toc-holder, .selection, .settings {
         min-width: 500px;
         width: 50%;
         margin: auto;
