@@ -97,7 +97,7 @@ const loadPage = (index, callback) => {
 
         for (const a of $page.find("a")) {
             const $a = $(a);
-            const link = $a.attr("href");
+            const link = $a.attr("href") || "";
             if(link.startsWith("http://") || link.startsWith("https://")) {
                 $a.attr("target", "_blank");
                 continue;
@@ -106,6 +106,10 @@ const loadPage = (index, callback) => {
             $a.click(() => {
                 goto(link);
             });
+        }
+
+        for (const element of $page.find("style")) {
+            $(element).remove();
         }
 
         // $a.append($page);
