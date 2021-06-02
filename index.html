@@ -3,6 +3,9 @@
         <title>EBook Reader</title>
         <script src="jquery-3.6.0.min.js"></script>
         <script src="jszip.min.js"></script>
+
+        <script src="book.js"></script>
+        <script src="renderer.js"></script>
         <script src="index.js"></script>
         
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -26,6 +29,10 @@
                     </ol>
                 </div>
             </div>
+        </div>
+
+        <div class="loading-overlay" hidden>
+            Loading... <span id="loading-percent"></span>%
         </div>
 
         <input type="button" id="btn-menu" value="menu" />
