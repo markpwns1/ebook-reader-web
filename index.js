@@ -84,7 +84,7 @@ function populateTableOfContents() {
         const $a = $(document.createElement("a"));
         $a.text(item.label);
         $a.click(() => {
-            goto(item.link, closeMenu);
+            goto(book.ncxPath, item.link, closeMenu);
         });
         $item.append($a);
         $toc.append($item);

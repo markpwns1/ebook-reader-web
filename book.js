@@ -1,6 +1,10 @@
 const EBOOK_CONTAINER_PATH = "META-INF/container.xml";
 
 const appendPath = (a, b) => {
+    if(a.startsWith("./")) a = a.slice(2);
+    else if(a.startsWith("/")) a = a.slice(1);
+    if(b.startsWith("./")) b = b.slice(2);
+
     if(a.endsWith("/") && b.startsWith("/")) return a + b.slice(1);
     else if(a != "" && b != "" && !a.endsWith("/") && !b.endsWith("/")) return a + "/" + b;
     else return a + b;
@@ -13,9 +17,6 @@ const getDirFromPath = x => x.includes("/")? x.slice(0, x.lastIndexOf("/")) : ""
  * @param {string} path 
  */
 function fixPath(path) {
-
-    if (path.startsWith("./"))
-        path = path.substring(2);
 
     let i = 0;
     while (i < path.length - 2) {
@@ -33,6 +34,9 @@ function fixPath(path) {
         }
     }
 
+    if(path.startsWith("./")) path = path.slice(2);
+    else if(path.startsWith("/")) path = path.slice(1);
+
     return path;
 }
 
@@ -49,6 +53,8 @@ class Book {
     content = [ ];
     spine = [ ];
     tableOfContents = [ ];
+
+    ncxPath;
 
     static open(file, onsuccess, onerror) {
         const b = new Book();
@@ -118,7 +124,8 @@ class Book {
                     if(ncxFile) {
 
                         this.openFile(ncxFile.href, "text", txt => {
-                            
+                            this.ncxPath = ncxFile.href;
+
                             const $xml = $($.parseXML(txt));
 
                             let navPoints = $xml.find("navPoint");
