@@ -3,12 +3,12 @@ String.prototype.hashCode = function() {
     var hash = 0, i, chr;
     if (this.length === 0) return hash;
     for (i = 0; i < this.length; i++) {
-      chr   = this.charCodeAt(i);
-      hash  = ((hash << 5) - hash) + chr;
-      hash |= 0; // Convert to 32bit integer
+        chr = this.charCodeAt(i);
+        hash = ((hash << 5) - hash) + chr;
+        hash |= 0; // Convert to 32bit integer
     }
     return hash;
-  };
+};
 
 /**
  * @type Book
@@ -21,14 +21,12 @@ let book;
 let renderer;
 
 let $content;
-let currentPage = 0;
-let loaded = [ ];
-let loading = false;
-let root = "";
 
-const goto = (link, callback) => {
+let currentPage = 0;
+
+const goto = (from, link, callback) => {
     const filePath = link.includes("#")? link.substring(0, link.indexOf("#")) : link;
-    const file = book.getContentFile(filePath);
+    const file = book.getFile(appendPath(getDirFromPath(from), fixPath(filePath)));
     const index = book.getSpineIndex(file);
 
     const startPage = currentPage;
@@ -68,7 +66,7 @@ const goto = (link, callback) => {
 
 const loadPage = (index, callback) => {
     const file = book.getFileBySpineIndex(index);
-    renderer.render(file, $("#content"), () => {
+    renderer.render(file, $content, () => {
         currentPage = index;
         console.log("Loaded " + file.href);
         if (callback) callback();
@@ -106,12 +104,14 @@ const detectNextPageLoad = () => {
 };
 
 const openFile = f => {
+    currentPage = 0;
     $content.html("");
 
     Book.open(f, b => {
         book = b;
         renderer = new Renderer(book);
         populateTableOfContents();
+        $content.html("");
         loadPage(0, detectNextPageLoad);
     },
     e => {
@@ -122,7 +122,6 @@ const openFile = f => {
 $(document).ready(() => {
 
     $content = $("#content");
-    // $content.html("");
 
     let $files = $("#file");
     if($files[0].files.length > 0) {

@@ -16,12 +16,14 @@ class Renderer {
 
         this.loading = true;
 
+        const dir = getDirFromPath(file.href);
+
         this.book.openFile(file.href, "text", txt => {
             const $a = $("<a id='GOTO_" + file.id.hashCode() + "' ></a>");
             const $page = $("<div>" + txt + "</div>");
 
             for(const img of $page.find("img")) {
-                this.book.openContent(img.getAttribute("src"), "blob", blob => {
+                this.book.openFile(appendPath(dir, img.getAttribute("src")), "blob", blob => {
                     img.src = URL.createObjectURL(blob);
                 });
                 img.classList.add("centered-image");
@@ -29,7 +31,7 @@ class Renderer {
 
             for (const img of $page.find("image")) {
                 const $newImage = $(img);
-                this.book.openContent($newImage.attr("xlink:href"), "blob", blob => {
+                this.book.openFile(appendPath(dir, $newImage.attr("xlink:href")), "blob", blob => {
                     $newImage.attr("xlink:href", URL.createObjectURL(blob));
                 });
             }
@@ -45,7 +47,7 @@ class Renderer {
 
                 if(options && options.gotoFn)
                     $a.click(() => {
-                        options.gotoFn(link);
+                        options.gotoFn(file.href, link);
                     });
             }
 
