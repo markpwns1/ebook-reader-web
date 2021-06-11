@@ -70,11 +70,23 @@ class Book {
         JSZip.loadAsync(file).then(zip => {
             this.zip = zip;
 
-            zip.file(EBOOK_CONTAINER_PATH).async("text").then(txt => {
+            const ebookContainerFile = zip.file(EBOOK_CONTAINER_PATH);
+            if(!ebookContainerFile) {
+                onerror(new Error("E-Book is missing the file: " + EBOOK_CONTAINER_PATH));
+                return;
+            }
+
+            ebookContainerFile.async("text").then(txt => {
 
                 const contentFile = $($.parseXML(txt)).find("rootfile").attr("full-path");
+                const foundFile = zip.file(contentFile);
 
-                zip.file(contentFile).async("text").then(txt => {
+                if(!foundFile) {
+                    onerror(new Error("Content file was not found at: " + contentFile));
+                    return;
+                }
+
+                foundFile.async("text").then(txt => {
 
                     if(contentFile.includes("/"))
                         this.contentRoot = contentFile.substring(0, contentFile.lastIndexOf("/") + 1)
@@ -188,7 +200,15 @@ class Book {
             return;
         }
 
-        this.zip.file(path).async(type).then(onsuccess).catch(onerror);
+        const f = this.zip.file(path);
+        
+        if(!f) {
+            if(onerror) onerror(this.generateFileNotFoundError(path));
+            else console.log(this.generateFileNotFoundError(path));
+            return;
+        }
+
+        f.async(type).then(onsuccess).catch(onerror);
     }
 
     openContent(path, type, onsuccess, onerror) {
