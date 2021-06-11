@@ -79,16 +79,25 @@ function populateTableOfContents() {
     $(".toc-holder").show();
     const $toc = $("#table-of-contents");
     $toc.html("");
-    for (const item of book.tableOfContents) {
+
+    if(book.tableOfContents.length == 0) {
         const $item = $(document.createElement("li"));
-        const $a = $(document.createElement("a"));
-        $a.text(item.label);
-        $a.click(() => {
-            goto(book.ncxPath, item.link, closeMenu);
-        });
-        $item.append($a);
+        $item.text("This book does not contain a table of contents.");
         $toc.append($item);
     }
+    else {
+        for (const item of book.tableOfContents) {
+            const $item = $(document.createElement("li"));
+            const $a = $(document.createElement("a"));
+            $a.text(item.label);
+            $a.click(() => {
+                goto(book.ncxPath, item.link, closeMenu);
+            });
+            $item.append($a);
+            $toc.append($item);
+        }
+    }
+    
 
     $("#book-title").text(book.title);
 }
@@ -112,7 +121,10 @@ const openFile = f => {
         renderer = new Renderer(book);
         populateTableOfContents();
         $content.html("");
-        loadPage(0, detectNextPageLoad);
+        loadPage(0, () => {
+            detectNextPageLoad();
+            closeMenu();
+        });
     },
     e => {
         console.log(e);
