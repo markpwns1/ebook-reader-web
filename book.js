@@ -1,5 +1,41 @@
 const EBOOK_CONTAINER_PATH = "META-INF/container.xml";
 
+const appendPath = (a, b) => {
+    if(a.endsWith("/") && b.startsWith("/")) return a + b.slice(1);
+    else if(a != "" && b != "" && !a.endsWith("/") && !b.endsWith("/")) return a + "/" + b;
+    else return a + b;
+};
+
+const getDirFromPath = x => x.includes("/")? x.slice(0, x.lastIndexOf("/")) : "";
+
+/**
+ * 
+ * @param {string} path 
+ */
+function fixPath(path) {
+
+    if (path.startsWith("./"))
+        path = path.substring(2);
+
+    let i = 0;
+    while (i < path.length - 2) {
+        const sl = path.slice(i, i + 3);
+        if (sl == "/..") {
+            let j = i;
+            path = path.slice(0, i) + path.slice(Math.min(path.length, i + 3))
+            do {
+                i--;
+            } while (path[i] != "/" && i > 0);
+            path = path.slice(0, i) + path.slice(Math.min(path.length, j))
+        }
+        else {
+            i++;
+        }
+    }
+
+    return path;
+}
+
 class Book {
 
     zip = null;
@@ -110,17 +146,15 @@ class Book {
     }
 
     getFile(path) {
-        if(path.startsWith("./"))
-            path = path.substring(2);
+        path = fixPath(path);
 
         const found = this.content.find(x => x.href == path);
-        if(!found) throw generateFileNotFoundError(path);
+        if(!found) throw this.generateFileNotFoundError(path);
         return found;
     }
 
     getContentFile(path) {
-        if(path.startsWith("./"))
-            path = path.substring(2);
+        path = fixPath(path);
         
         return this.getFile(this.contentRoot + path);
     }
@@ -139,11 +173,11 @@ class Book {
     }
 
     openFile(path, type, onsuccess, onerror) {
-        if(path.startsWith("./"))
-            path = path.substring(2);
+        path = fixPath(path);
 
         if(!this.content.find(x => x.href == path)) {
-            onerror(generateFileNotFoundError(path));
+            if(onerror) onerror(this.generateFileNotFoundError(path));
+            else console.log(this.generateFileNotFoundError(path));
             return;
         }
 
@@ -151,8 +185,7 @@ class Book {
     }
 
     openContent(path, type, onsuccess, onerror) {
-        if(path.startsWith("./"))
-            path = path.substring(2);
+        path = fixPath(path);
 
         this.openFile(this.contentRoot + path, type, onsuccess, onerror);
     }
