@@ -23,10 +23,15 @@ class Renderer {
             const $page = $("<div>" + txt + "</div>");
 
             for(const img of $page.find("img")) {
+
                 this.book.openFile(appendPath(dir, img.getAttribute("src")), "blob", blob => {
                     img.src = URL.createObjectURL(blob);
+                    const $a = $("<a target='_blank' href='" + URL.createObjectURL(blob) + "'></a>");
+                    $a.append($(img));
+                    $page.append($a);
                 });
                 img.classList.add("centered-image");
+                img.parentNode.removeChild(img);
             }
 
             for (const img of $page.find("image")) {
