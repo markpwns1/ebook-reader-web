@@ -127,7 +127,7 @@ const openFile = f => {
         });
     },
     e => {
-        console.log(e);
+        alert("Invalid file. Please contact the developer of this app if you disagree. Please ignore the text below.\n\n" + e);
     });
 };
 
