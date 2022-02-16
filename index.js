@@ -108,7 +108,7 @@ function closeMenu() {
 
 const detectNextPageLoad = () => {
     if ((window.innerHeight + window.scrollY) >= document.body.scrollHeight - 50) {
-        loadPage(currentPage + 1, detectNextPageLoad);
+        loadPage(Math.min(book.getPageCount() - 1, currentPage + 1), detectNextPageLoad);
     }
 };
 

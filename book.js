@@ -191,6 +191,10 @@ class Book {
         return this.getFileByID(this.spine[index]);
     }
 
+    getPageCount() {
+        return this.spine.length;
+    }
+
     openFile(path, type, onsuccess, onerror) {
         path = fixPath(path);
 

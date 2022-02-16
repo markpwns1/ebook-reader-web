@@ -20,8 +20,18 @@ class Renderer {
 
         this.book.openFile(file.href, "text", txt => {
             const $a = $("<a id='GOTO_" + file.id.hashCode() + "' ></a>");
-            const $page = $("<div>" + txt + "</div>");
 
+            // for (let i = 0; i < txt.length; i++) {
+            //     const c = txt[i];
+            //     if(c == "<" && c == "") {
+
+            //     }
+            // }
+
+            txt = txt.replace(/<script /g, "<erased ");
+
+            const $page = $("<div>" + txt + "</div>");
+            // console.log(txt);
             for(const img of $page.find("img")) {
 
                 this.book.openFile(appendPath(dir, img.getAttribute("src")), "blob", blob => {
@@ -60,7 +70,14 @@ class Renderer {
                 $(element).remove();
             }
 
+            // for (const element of $page.find("script")) {
+            //     $(element).remove();
+            // }
+
+            $page.find("*").removeAttr("style");
+            
             $page.prepend($a);
+
 
             this.loading = false;
             if(onsuccess) onsuccess($page);
